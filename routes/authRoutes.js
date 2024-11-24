@@ -62,7 +62,6 @@ router.post("/refresh",async(req,res)=>{
   if(!refreshToken) return res.status(400).json({ message: 'No refresh token received' });
 
   jwt.verify(refreshToken,process.env.JWT_REFRESH_SECRET,(err,user)=>{
-    console.log(user)
       if(err) return res.status(401).json({ message: 'Refresh token authentication failed' });
 
       const accessToken=generateAccessToken(user.id);

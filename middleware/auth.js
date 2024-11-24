@@ -21,8 +21,6 @@ const authMiddleware = (req, res, next) => {
 const isAdminMiddleware = async (req, res, next) => {
   const user = await User.findById(req.user.id)
 
-  console.log(user)
-
   if (user && user.admin) {
     return next();
   } else {

@@ -5,8 +5,21 @@ const {authMiddleware} = require('../middleware/auth');
 
 router.use(authMiddleware)
 
+// Get User Info
+router.get('/me', async (req, res) => {
+  const { id } = req.user;
+
+  try {
+    const user = await User.findOne({ _id: id}).select({password: 0 });
+
+    user ? res.status(200).json({ user }) : res.status(404).json({ message: 'User not found' })
+  } catch (error) {
+    res.status(500).json({ message: 'Internal server error', error });
+  }
+});
+
 // Edit User
-router.patch('/update', async (req, res) => {
+router.patch('/me/edit', async (req, res) => {
   const { id } = req.user;
 
   try {

@@ -4,19 +4,19 @@ const Product = require('../models/product');
 const {authMiddleware} = require('../middleware/auth');
 
 const router = express.Router();
-// router.use(authMiddleware);
+router.use(authMiddleware);
 
 // Create or update basket
 router.post('/add', async (req, res) => {
   const { productId, quantity } = req.body;
-  const userId = req.user._id;
+  const { id } = req.user;
 
   try {
-    let basket = await Basket.findOne({ userId });
+    let basket = await Basket.findOne({ userId: id });
 
     if (!basket) {
       basket = new Basket({
-        userId,
+        userId: id,
         products: [{ productId, quantity }],
       });
     } else {
@@ -54,10 +54,10 @@ router.post('/add', async (req, res) => {
 
 // View basket
 router.get('/view', async (req, res) => {
-  const userId = req.user._id;
+  const { id } = req.user;
 
   try {
-    const basket = await Basket.findOne({ userId }).populate('products.productId');
+    const basket = await Basket.findOne({ userId: id }).populate('products.productId');
 
     if (!basket) {
       return res.status(404).json({ message: 'Basket not found for this user' });
@@ -72,10 +72,10 @@ router.get('/view', async (req, res) => {
 // Remove product from basket
 router.delete('/remove/:productId', async (req, res) => {
   const { productId } = req.params;
-  const userId = req.user._id;
+  const { id } = req.user;
 
   try {
-    const basket = await Basket.findOne({ userId });
+    const basket = await Basket.findOne({ userId: id });
     if (!basket) {
       return res.status(404).json({ message: 'Basket not found for this user' });
     }
@@ -102,11 +102,11 @@ router.delete('/remove/:productId', async (req, res) => {
 });
 
 // Clear basket
-router.delete('/remove/all', async (req, res) => {
-  const userId = req.user._id;  // Get user ID from validated token
+router.delete('/clearAll', async (req, res) => {
+  const { id } = req.user;
 
   try {
-    const basket = await Basket.findOneAndDelete({ userId });
+    const basket = await Basket.findOneAndDelete({userId: id});
 
     if (!basket) {
       return res.status(404).json({ message: 'Basket not found for this user' });
